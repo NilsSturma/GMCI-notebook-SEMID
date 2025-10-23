@@ -1,82 +1,266 @@
 ---
 bibliography: references.bib 
 authors: # see https://quarto.org/docs/journals/authors.html for further options
-  - name: Firstname Lastname
-    orcid: 0000-0001-0002-0003
-    affiliation: "Your University"
-    country: CountryABC
+  - name: Nils Sturma
+    orcid: 0000-0001-8718-3935
+    affiliation: "EPFL"
+    country: Switzerland
 ---
 
-# Your Notebook Name
+# SEMID Package for Deciding Identifiability in Linear Causal Models
 
 | Resource | Information |
 |----|----|
-| Data DOI | [10.5281/zenodo.1234567](10.5281/zenodo.1234567) |
-| Git + DOI | [Git](https://github.com/username/project) [10.5281/zenodo.7654321](10.5281/zenodo.754321) |
-| Short Description | Short description of the main contributions and notebook structure |
+| Git | [Git](https://github.com/NilsSturma/GMCI-notebook-SEMID) |
+| Short Description | The SEMID package  offers a number of different functions for deciding global and generic identifiability in linear structural equation models with latent variables. In this notebook, we present its main functionality. We also show how to use easy plug-in estimators if identifiability holds. |
 
 : {.striped}
 
 ## Introduction
 
-Write an introduction to the analysis. Give references via @Mareis_Haug_Drton_2025. The bibtex entries are saved in `references.bib`.
+This notebook presents the SEMID package that offers a number of different functions for deciding global and generic identifiability in linear structural equation models (SEMs) with latent variables. Each model is defined by a directed graph or by a mixed graph, depending on the modeling assumptions. Identifiability holds if the linear coefficients corresponding to the direct causal effects can be uniquely recovered from the covariance matrix of the observable distribution.
 
-## Loading the Data
+We first load the required packages.
 
-Create an R environment and save it in the file `renv.lock` with `renv::init()` and `renv::snapshot()`. For detailed information, see the [renv website](https://rstudio.github.io/renv/articles/renv.html).
-Load the R environment with our standardized loading function.
-```{r, message=TRUE, warning=TRUE, eval=FALSE}
-# activate the chunk with eval=TRUE
-source("../../load_environment.R")
+```{r, message=FALSE, warning=FALSE, eval=TRUE}
+# Load R environment
+original_libpaths <- .libPaths()
+if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
+suppressMessages({
+  renv::load()
+  if (!all(renv::status()$synchronized)) renv::restore(prompt = FALSE)
+})
+
+# Used packages, only for information
+library(SEMID) # deciding identifiability
+library(MASS) # sampling from multivariate normal distribution
 ```
 
-Shortly describe the packages that were responsible for the R environment.
-```{r, message=FALSE, eval=FALSE}
-# Used packages, only for information.
-library(package1) # function of package1
-library(package2) # function of package2
+## Linear SEMs Given by Mixed Graphs 
+
+In linear structural equation models given by mixed graphs, the confounding effects of the latent variables are represented by correlation among noise terms. Let $G=(V,D,B)$ be a mixed graph, where $V=\{1, \ldots, p\}$ is a finite set of nodes, $D$ is a set of directed edges, and $B$ is a set of bidirected edges. Moreover, let $X=(X_v)_{v \in V}$ be a random vector that is indexed by the nodes of the graph. We suppose that $X$ solves the linear equation system 
+$$
+  X = \Lambda^{\top} X + \varepsilon,
+$$
+where $\varepsilon = (\varepsilon_v)_{v \in V}$ is a vector of noise variables with mean zero and positive definite covariance matrix $\Omega = (\omega_{vw})$. Two noise variables $\varepsilon_v$ and $\varepsilon_w$ are assumed to be uncorrelated whenever there is no bidirected edge in the graph, i.e., in this case it holds that $\omega_{vw} = 0$.  The coefficient matrix $\Lambda = (\lambda_{vw})$ is sparse according to the bidirected part of the graph, that is, $\lambda_{vw} = 0$ if the directed edge from $v$ to $w$ is not in $D$. The coefficients $\lambda_{vw}$ may be interpreted as direct causal effects and are the main objects of interest. Note that if $I - \Lambda$ is invertible, then the covariance matrix of $X$ is given by 
+$$
+  \Sigma := \text{Cov}[X] = (I - \Lambda)^{-\top} \Omega (I - \Lambda)^{-1}.
+$$
+Identifiability holds if we can recover the matrix $\Lambda$ uniquely from a given covariance matrix $\Sigma$. We differentiate between global and generic identifiability: A mixed graph is said to be globally identifiable, if identifiability holds for all parameter choices. On the other hand, a mixed graph is said to be generically identifiable, if identifiability holds for almost all parameter choices. Note that a graph is generically identifiable if and only if all directed edges are generically identifiable.
+
+In the `SEMID` package, we represent mixed graphs via the MixedGraph class. The implementation is using the `R.oo` package by @R.oo.
+
+```{r, message=FALSE, warning=FALSE}
+# Mixed graphs are specified by their directed adjacency matrix L 
+# and bidirected adjacency matrix O.
+L <- t(matrix(c(0, 1, 0, 0, 0,
+                0, 0, 0, 1, 1,
+                0, 0, 0, 1, 0,
+                0, 1, 0, 0, 1,
+                0, 0, 0, 1, 0), 5, 5))
+
+O <- t(matrix(c(0, 0, 0, 0, 0,
+                0, 0, 1, 0, 1,
+                0, 0, 0, 1, 0,
+                0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0), 5, 5)); O<-O+t(O)
+
+# Create the mixed graph object corresponding to L and O
+g <- MixedGraph(L, O)
+
+# Plot the mixed graph
+g$plot()
+```
+For deciding global identifiability, there exists an 'if and only if' graphical criterion developed by @drton2011global. This criterion can be accessed through the function `globalID`.
+
+```{r, message=FALSE, warning=FALSE}
+# Check global identifiability
+globalID(g)
 ```
 
-Load the data. Prefereably from Zenodo:
-```{r, message = FALSE, warning=FALSE, eval=FALSE}
-# Load Data
-zenodo <- ZenodoManager$new(logger = NULL)
-record <- zenodo$getRecordByDOI("10.5281/zenodo.1234567")
-files <- record$listFiles(pretty = TRUE)
-alarm <- as.matrix(read.csv(files[1, 4]))
+There still do not exist any 'if and only if' graphical conditions for testing whether or not a mixed graph is generically identifiable. However, there do exist sufficient and necessary conditions. The SEMID package contains implementations of various sufficient conditions: The half-trek criterion by @foygel2012halftrek, ancestor decomposition techniques by @drton2016generic, and the edgewise and determinantal criteria by @weihs2017determinantal. 
+
+```{r, message=FALSE, warning=FALSE}
+# Check generic identifiability using different criteria
+htcID(g)
+ancestralID(g)
+edgewiseID(g)
+edgewiseTSID(g)
 ```
 
-## Analysis
-
-Write some educational analysis text and carry out the analysis.
-
-```{r}
-mean(c(1 + 2, 3 * 4))
+Note that, by default, all strategies first apply a Tian decomposition and then check identifiability on each of the components. This yields faster computations as described in Section 8 of @foygel2012halftrek. It is also possible to apply different identification strategies repeatedly until no further edges can be identified. This is possible via the function `generalGenericID`. 
+```{r, message=FALSE, warning=FALSE}
+# Check generic identifiability by repeatedly applying different criteria
+generalGenericID(mixedGraph = g, 
+                 idStepFunctions = list(htcIdentifyStep,
+                                        ancestralIdentifyStep, 
+                                        edgewiseIdentifyStep, 
+                                        trekSeparationIdentifyStep), 
+                 tianDecompose = TRUE)
 ```
 
-Analysis in other languages, e.g., Python are welcome as well. 
-```{python}
--1 / -2
+In this example, we do not get additional edges certified to be generically identifiability. Therefore, we check the necessary condition from @foygel2012halftrek for generic identifiability of the whole graph, which is also implemented in `SEMID`.
+
+```{r, message=FALSE, warning=FALSE}
+# Check necessary condition for generic identifiability 
+graphID.nonHtcID(g$L(), g$O())
+```
+This means that the given graph is infinite-to-one and, in particular, not generically identifiable. 
+
+## Linear SEMs Given by Latent-Factor Graphs
+
+The approach to model confounding via correlation is only effective when the confounding is sparse and effects only small subsets of the observed variables. There also exist criteria for checking identifiability in unprojected models, where some latent variables may also have dense effects on many or even all of the observables. One approach is the Latent-Factor Half-Trek Criterion by @barber2022halftrek, which operates on directed graphs with explicit latent nodes. However, the latent variables are restricted to be source nodes of the graph. Let $V$ be a finite set of observed nodes and let $\mathcal{L}$ be a disjoint, finite set of latent nodes. A latent-factor graph is a direct graph $G=(V \cup \mathcal{L},D)$ in which all latent variables are source nodes. Let $X=(X_v)_{v \in V}$ be an observed random vector, and let $L = (L_h)_{h \in \mathcal{L}}$ be a latent random vector. We suppose that all variables are related via the equation system
+$$
+  X = \Lambda^{\top} X + \Gamma^{\top} L + \varepsilon,
+$$
+where the vector $\varepsilon$ contains independent noise variables with mean zero and diagonal, positive definite covariance matrix $\Omega_{\text{diag}}$. Both coefficient matrices $\Lambda=(\lambda_{vw})$ and $\Gamma=(\gamma_{hv})$ are sparse according to the graph, that is, $\lambda_{vw} = 0$ if the directed edge from the observed node $v$ to the observed node $w$ is not in $D$, and $\gamma_{hv} = 0$ if the directed edge from the latent node $h$ to the observed node $v$ is not in $D$. Our main objects of interest are again the direct causal effects $\lambda_{vw}$ between the observed variables. If $I - \Lambda$ is invertible, the covariance matrix of $X$ is given by
+$$
+  \Sigma := \text{Cov}[X] = (I - \Lambda)^{-\top} (\Gamma^{\top} \Gamma + \Omega_{\text{diag}}) (I - \Lambda)^{-1}.
+$$
+Similar as for mixed graphs, we say that a latent-factor graph is generically identifiable if we can uniquely recover all direct causal effects from the covariance matrix for almost all parameter choices.
+
+In the `SEMID` package, we represent latent-factor graphs via the LatentDigraph class. 
+
+```{r, message=FALSE, warning=FALSE}
+# Latent digraphs are specified by their directed adjacency matrix L and 
+# their vectors of observed and latent nodes
+L <- t(matrix(c(0, 1, 0, 0, 0, 0,
+                0, 0, 1, 0, 0, 0,
+                0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 1, 0,
+                0, 0, 0, 0, 0, 0,
+                1, 1, 1, 1, 1, 0), 6, 6))
+observedNodes <- seq(1,5)
+latentNodes <- c(6)
+
+# Create the latent digraph object
+g <- LatentDigraph(L, observedNodes, latentNodes)
+
+# Plot the mixed graph
+g$plot()
 ```
 
-```{r, message=FALSE, warning=FALSE, eval=FALSE}
-# activate the chunk with eval=TRUE
-source("../../close_environment.R")
+The latent-factor half-trek criterion by @barber2022halftrek is a sufficient condition for generic identifiability. The criterion can be accessed through the function `lfhtcID`.
+
+```{r, message=FALSE, warning=FALSE}
+# Check generic identifiability of the latent-factor graph
+lfhtcID(g)
 ```
 
-## Citing this Notebook {.unnumbered}
+Note that the corresponding mixed graph obtained from a latent projection is not identifiable (see Section 4 in @barber2022halftrek). 
 
-Please cite XYZ with the following bib item.
+```{r, message=FALSE, warning=FALSE}
+# Get a mixed graph via latent projection
+gMixed <- g$getMixedGraph()
+gMixed$plot()
+
+# Check the original half-trek criterion on the mixed graph
+htcID(gMixed)
+```
+
+## Estimating Direct Causal Effects
+If a graph is generically identifiable, we can use the identification formulas to obtain estimators of the direct causal effects. We demonstrate this with the example of the following mixed graph:
+
+```{r, message=FALSE, warning=FALSE}
+# Define Mixed Graph
+L <- t(matrix(c(0, 1, 0, 0, 0,
+                0, 0, 0, 0, 0,
+                0, 0, 0, 1, 0,
+                0, 0, 0, 0, 1,
+                0, 0, 0, 0, 0), 5, 5))
+
+O <- t(matrix(c(0, 0, 1, 1, 0,
+                0, 0, 0, 1, 1,
+                0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0), 5, 5)); O<-O+t(O)
+
+# Create the mixed graph object corresponding to L and O
+g <- MixedGraph(L, O)
+
+# Plot the mixed graph
+g$plot()
+```
+
+First, we verify that the graph is generically identifiable using the half-trek criterion.
+
+```{r, message=FALSE, warning=FALSE}
+res <- htcID(g)
+res
+```
+
+Next, we randomly choose parameters and sample from a normal distribution that lies in the linear structural equation model given by the above graph.
+
+```{r, message=FALSE, warning=FALSE}
+# Create random parameter matrices that preserve the zero structure
+# Lambda
+Lambda <- matrix(0, nrow=nrow(L), ncol=ncol(L))
+maskL <- (L != 0)
+nObsEdges <- sum(maskL)
+Lambda[maskL] <- runif(nObsEdges, min = -1, max = 1)
+Lambda
+
+# Omega
+Omega<- matrix(0, nrow=nrow(O), ncol=ncol(O))
+upper_idx <- which(upper.tri(O) & O != 0, arr.ind = TRUE)
+k_upper <- nrow(upper_idx)
+if (k_upper > 0) {
+  vals <- runif(k_upper, min = -1, max = 1)
+  for (i in seq_len(k_upper)) {
+    Omega[upper_idx[i, "row"], upper_idx[i, "col"]] <- vals[i]
+    Omega[upper_idx[i, "col"], upper_idx[i, "row"]] <- vals[i]
+  }
+}
+diag(Omega) <- runif(nrow(O), min = 2, max = 3)
+Omega
+
+# Calculate the covariance matrix
+id <- diag(nrow(O))
+Sigma <- solve(t(id - Lambda)) %*% Omega %*% solve(id - Lambda)
+Sigma
+```
+
+
+
+```{r, message=FALSE, warning=FALSE}
+# For our example, we generate data from N(0, Sigma).
+# Number of samples
+n <- 1000
+
+# Mean vector (zero)
+mu <- rep(0, ncol(Sigma))
+
+# Draw samples
+X <- mvrnorm(n = n, mu = mu, Sigma = Sigma)
+
+# Compute sample covariance
+Sigma_hat <- cov(X)
+```
+
+Finally, we estimate the coefficient matrices $\Lambda$ and $\Omega$. The output of the `htcID`function contains the identifying formulas, where we plug in the sample covariance.
+```{r, message=FALSE, warning=FALSE}
+estimates <- res$identifier(Sigma_hat)
+estimates$Lambda
+estimates$Omega
+```
+
+
+## Citing This Notebook {.unnumbered}
+
+Please cite this notebook with the following bib item.
 
 ``` bibtex
-@article{XYZ
+@misc{SEMIDnotebook
+  title={SEMID Package for Deciding Identifiability in Linear Causal Models},
+  author={Sturma, Nils},
+  howpublished={Web Notebook},
+  year={2025},
+  url={TO BE ADDED}
 }
 ```
-
-When using the ABC dataset, please give credit to the original author: Author year.
 
 ## Additional Information {.unnumbered}
 
 **License Information:** Please follow the above DOI for license information of data and code.
 
-**Contact:** If you have suggestions, feel free to [create an issue](https://github.com/username/git-project/issues) or contact the authors (your@mail.address).
+**Contact:** If you have suggestions, feel free to [create an issue](https://github.com/NilsSturma/GMCI-notebook-SEMID/issues) or contact the author (nils.sturma@epfl.ch).
