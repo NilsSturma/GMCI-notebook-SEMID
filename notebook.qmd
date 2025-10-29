@@ -30,7 +30,8 @@ suppressMessages({
   renv::load()
   if (!all(renv::status()$synchronized)) renv::restore(prompt = FALSE)
 })
-
+```
+```{r, message=FALSE, warning=FALSE, eval=TRUE}
 # Used packages, only for information
 library(SEMID) # deciding identifiability
 library(MASS) # sampling from multivariate normal distribution
