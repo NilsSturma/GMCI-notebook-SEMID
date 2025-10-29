@@ -22,7 +22,7 @@ This notebook presents the SEMID package that offers a number of different funct
 
 We first load the required packages.
 
-```{r, message=FALSE, warning=FALSE, eval=TRUE}
+```{r, message=FALSE, warning=FALSE, eval=TRUE, include=FALSE}
 # Load R environment
 original_libpaths <- .libPaths()
 if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
