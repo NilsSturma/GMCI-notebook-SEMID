@@ -11,7 +11,7 @@ authors: # see https://quarto.org/docs/journals/authors.html for further options
 
 | Resource | Information |
 |----|----|
-| Git | [Git](https://github.com/NilsSturma/GMCI-notebook-SEMID) |
+| Git + DOI | [Git](https://github.com/NilsSturma/GMCI-notebook-SEMID) [10.5281/zenodo.17475524](https://doi.org/10.5281/zenodo.17475524)|
 | Short Description | The SEMID package  offers a number of different functions for deciding global and generic identifiability in linear structural equation models with latent variables. In this notebook, we present its main functionality. We also show how to use easy plug-in estimators if identifiability holds. |
 
 : {.striped}
