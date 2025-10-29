@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4 (e7c3feb1, 2024-10-09)"
+   sodipodi:docname="logo.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="5.4230759"
+     inkscape:cx="413.32632"
+     inkscape:cy="366.39723"
+     inkscape:window-width="1312"
+     inkscape:window-height="899"
+     inkscape:window-x="96"
+     inkscape:window-y="46"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:6.35px;line-height:0;font-family:'.Beirut PUA';-inkscape-font-specification:'.Beirut PUA Bold';text-align:start;letter-spacing:0.79375px;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#a47cbe;stroke:#db6e37;stroke-width:0.1;stroke-linejoin:round"
+       x="99.228073"
+       y="95.989182"
+       id="text1"
+       inkscape:export-filename="../gallery_picture.png"
+       inkscape:export-xdpi="500"
+       inkscape:export-ydpi="500"><tspan
+         sodipodi:role="line"
+         id="tspan1"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'.Beirut PUA';-inkscape-font-specification:'.Beirut PUA Bold';fill:#dd0000;fill-opacity:1;stroke:none;stroke-width:0.1"
+         x="99.228073"
+         y="95.989182">SEM</tspan><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'.Beirut PUA';-inkscape-font-specification:'.Beirut PUA Bold';stroke-width:0.1"
+         x="99.228073"
+         y="95.989182"
+         id="tspan2" /></text>
+    <text
+       xml:space="preserve"
+       style="font-size:6.35px;line-height:0;font-family:sans-serif;-inkscape-font-specification:sans-serif;text-align:start;letter-spacing:0.79375px;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#a47cbe;stroke:#db6e37;stroke-width:0.1;stroke-linejoin:round"
+       x="106.41003"
+       y="102.17253"
+       id="text4"><tspan
+         sodipodi:role="line"
+         id="tspan4"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'.Beirut PUA';-inkscape-font-specification:'.Beirut PUA Bold';fill:#4a0079;fill-opacity:1;stroke:none;stroke-width:0.1"
+         x="106.41003"
+         y="102.17253">ID</tspan></text>
+    <circle
+       style="fill:#dd0000;fill-opacity:1;stroke:#000000;stroke-width:0.19389;stroke-linejoin:round;stroke-opacity:1"
+       id="path5"
+       cx="117.70325"
+       cy="95.081642"
+       r="0.58166915" />
+    <circle
+       style="fill:#dd0000;fill-opacity:1;stroke:#000000;stroke-width:0.19389;stroke-linejoin:round;stroke-opacity:1"
+       id="path5-3"
+       cx="119.37171"
+       cy="101.69115"
+       r="0.58166915" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.387779;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       d="m 119.8233,99.956176 -0.55708,0.544094 -0.59706,-0.48044"
+       id="path6-3" />
+    <path
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.395306;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       d="m 117.24133,94.306637 c -0.53304,-2.128599 4.48204,-4.831852 4.55502,-0.09675 0.0545,3.538313 -2.71363,1.114517 -2.51979,6.202593"
+       id="path8"
+       sodipodi:nodetypes="csc" />
+  </g>
+</svg>
