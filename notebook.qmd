@@ -75,23 +75,23 @@ For deciding global identifiability, there exists an 'if and only if' graphical 
 
 ```{r, message=FALSE, warning=FALSE}
 # Check global identifiability
-globalID(g)
+SEMID::globalID(g)
 ```
 
 There still do not exist any 'if and only if' graphical conditions for testing whether or not a mixed graph is generically identifiable. However, there do exist sufficient and necessary conditions. The SEMID package contains implementations of various sufficient conditions: The half-trek criterion by @foygel2012halftrek, ancestor decomposition techniques by @drton2016generic, and the edgewise and determinantal criteria by @weihs2017determinantal. 
 
 ```{r, message=FALSE, warning=FALSE}
 # Check generic identifiability using different criteria
-htcID(g)
-ancestralID(g)
-edgewiseID(g)
-edgewiseTSID(g)
+SEMID::htcID(g)
+SEMID::ancestralID(g)
+SEMID::edgewiseID(g)
+SEMID::edgewiseTSID(g)
 ```
 
 Note that, by default, all strategies first apply a Tian decomposition and then check identifiability on each of the components. This yields faster computations as described in Section 8 of @foygel2012halftrek. It is also possible to apply different identification strategies repeatedly until no further edges can be identified. This is possible via the function `generalGenericID`. 
 ```{r, message=FALSE, warning=FALSE}
 # Check generic identifiability by repeatedly applying different criteria
-generalGenericID(mixedGraph = g, 
+SEMID::generalGenericID(mixedGraph = g, 
                  idStepFunctions = list(htcIdentifyStep,
                                         ancestralIdentifyStep, 
                                         edgewiseIdentifyStep, 
@@ -103,7 +103,7 @@ In this example, we do not get additional edges certified to be generically iden
 
 ```{r, message=FALSE, warning=FALSE}
 # Check necessary condition for generic identifiability 
-graphID.nonHtcID(g$L(), g$O())
+SEMID::graphID.nonHtcID(g$L(), g$O())
 ```
 This means that the given graph is infinite-to-one and, in particular, not generically identifiable. 
 
@@ -134,7 +134,7 @@ observedNodes <- seq(1,5)
 latentNodes <- c(6)
 
 # Create the latent digraph object
-g <- LatentDigraph(L, observedNodes, latentNodes)
+g <- SEMID::LatentDigraph(L, observedNodes, latentNodes)
 
 # Plot the mixed graph
 g$plot()
@@ -144,7 +144,7 @@ The latent-factor half-trek criterion by @barber2022halftrek is a sufficient con
 
 ```{r, message=FALSE, warning=FALSE}
 # Check generic identifiability of the latent-factor graph
-lfhtcID(g)
+SEMID::lfhtcID(g)
 ```
 
 Note that the corresponding mixed graph obtained from a latent projection is not identifiable (see Section 4 in @barber2022halftrek). 
@@ -155,7 +155,7 @@ gMixed <- g$getMixedGraph()
 gMixed$plot()
 
 # Check the original half-trek criterion on the mixed graph
-htcID(gMixed)
+SEMID::htcID(gMixed)
 ```
 
 ## Estimating Direct Causal Effects
