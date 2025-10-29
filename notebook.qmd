@@ -3,7 +3,7 @@ bibliography: references.bib
 authors: # see https://quarto.org/docs/journals/authors.html for further options
   - name: Nils Sturma
     orcid: 0000-0001-8718-3935
-    affiliation: "Ecole polytechnique fédérale de Lausanne (EPFL)."
+    affiliation: "Ecole polytechnique fédérale de Lausanne (EPFL)"
     country: Switzerland
 ---
 
