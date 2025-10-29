@@ -256,7 +256,7 @@ Please cite this notebook with the following bib item.
   author={Sturma, Nils},
   howpublished={Web Notebook},
   year={2025},
-  url={TO BE ADDED}
+  url={https://st-mardi.quarto.pub/gmci/chapters/notebook_gallery/notebooks/GMCI-notebook-SEMID/notebook.html}
 }
 ```
 
