@@ -13,7 +13,7 @@ editor:
 # SEMID Package for Deciding Identifiability in Linear Causal Models
 
 | Resource | Information |
-|----|----|
+|------------------------------------|------------------------------------|
 | Git + DOI | [Git](https://github.com/NilsSturma/GMCI-notebook-SEMID) [10.5281/zenodo.17475524](https://doi.org/10.5281/zenodo.17475524) |
 | Short Description | The SEMID package offers a number of different functions for deciding global and generic identifiability in linear structural equation models with latent variables. In this notebook, we present its main functionality. We also show how to use easy plug-in estimators if identifiability holds. |
 
@@ -311,7 +311,7 @@ n <- 1000
 mu <- rep(0, ncol(Sigma))
 
 # Draw samples
-X <- mvrnorm(n = n, mu = mu, Sigma = Sigma)
+X <- MASS::mvrnorm(n = n, mu = mu, Sigma = Sigma)
 
 # Compute sample covariance
 Sigma_hat <- cov(X)
